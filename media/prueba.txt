@@ -1,0 +1,7 @@
+Dentro de la carpeta /media
+Pon imagenes, archivos.
+Para despues subirlo a AWS S3
+
+Para subir un archivo que no se encuentra en la carpeta raiz del programa es
+Como por ejemplo este texto, que se encuentra en carpeta de media
+''' ./media/prueba.txt '''
