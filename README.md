@@ -3,15 +3,20 @@
 02. Añade tus credenciales en el programa.
 
 # Instruccion para ejecutar programa
-1. Entrar a la carpeta del archivo
+1. Clona el repositorio
+    ```bash
+    git clone https://github.com/victortelles/DESARROLLO_NUBE.git
+    ```
+
+2. Entrar a la carpeta del archivo
     ```bash
     cd DESARROLLO_NUBE
     ```
-2. Instalar dependencias:
+3. Instalar dependencias:
     ```bash
     pip install -r requeriments.txt
     ```
-3. Corre el proyecto:
+4. Corre el proyecto:
     ```bash
     python.exe '.\AWS SDK.py'
     ```
