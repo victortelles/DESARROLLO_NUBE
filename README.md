@@ -5,7 +5,7 @@
 # Instruccion para ejecutar programa
 1. Descarga el archivo dentro de la rama 'Practica_1-Actv_2' del repositorio
     ```bash
-    git clone https://github.com/victortelles/DESARROLLO_NUBE.git
+    https://github.com/victortelles/DESARROLLO_NUBE/archive/refs/heads/Practica_1-Actv_2.zip
     ```
 
 2. Entrar a la carpeta del archivo
