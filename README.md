@@ -3,7 +3,7 @@
 02. Añade tus credenciales en el programa.
 
 # Instruccion para ejecutar programa
-1. Clona el repositorio
+1. Descarga el archivo dentro de la rama 'Practica_1-Actv_2' del repositorio
     ```bash
     git clone https://github.com/victortelles/DESARROLLO_NUBE.git
     ```
