@@ -1,6 +1,6 @@
 # !!! Recuerda Prender tu laboratorio de AWS
-0.1. Copiar tus credenciales de AWS
-0.2. Añade tus credenciales en el programa.
+01. Copiar tus credenciales de AWS
+02. Añade tus credenciales en el programa.
 
 # Instruccion para ejecutar programa
 1. Entrar a la carpeta del archivo
