@@ -44,21 +44,21 @@ const subirArchivo = (req, res) => {
         });
     }
 
-    // Obtener la clave del archivo desde req.files (puede variar el nombre)
-    const archivoClave = Object.keys(req.files)[0];  // Obtiene la primera clave en req.files
-    let archivo = req.files[archivoClave];  // Obtiene el archivo usando la clave
+    // Obtener la clave del archivo
+    const archivoClave = Object.keys(req.files)[0];
+    let archivo = req.files[archivoClave];
 
-    // Mostrar detalles del archivo para depuración
+    // debugg
     console.log('Archivo recibido:', archivo);
 
-    // Verifica que el archivo tenga un nombre válido
+    // Verifica que el archivo tenga un nombre
     if (!archivo || !archivo.name) {
         return res.status(400).json({
             message: 'No se pudo obtener el archivo correctamente.'
         });
     }
 
-    // Generar un nombre temporal para el archivo (para depurar)
+    //Asignar nombre al archivo subido
     const rutaTemporal = path.join(directorioArchivos, `TEMP_${archivo.name}`);
 
     // Mover el archivo al directorio de almacenamiento
@@ -70,15 +70,12 @@ const subirArchivo = (req, res) => {
                 error: err.message
             });
         }
-
-        // Confirmación exitosa
         res.status(200).json({
             message: 'Archivo subido correctamente',
             rutaArchivo: rutaTemporal
         });
     });
 };
-
 
 //Exportar funciones
 module.exports = {
