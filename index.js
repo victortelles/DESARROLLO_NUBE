@@ -37,5 +37,5 @@ app.use('/assets', express.static(path.join(__dirname, 'src/assets')));
 
 // Iniciar servidor
 app.listen(port, () => {
-    console.log(`Servidor corriendo en el puerto ${port} dentro de la instancia EC2`);
+    console.log(`Servidor corriendo en el puerto ${port}`);
 });
