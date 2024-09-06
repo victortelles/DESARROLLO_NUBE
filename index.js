@@ -1,29 +1,41 @@
-//Arranque servidor
+// Librerías necesarias
 const express = require('express');
-const path = require('path')
-const app  = express();
+const path = require('path');
 const AWS = require('aws-sdk');
-const port = process.env.PORT || 3000;
-//importar rutas
-const routes = require('./src/routes');
-//Subida de archivos - libreria
 const fileUpload = require('express-fileupload');
-//cargar credenciales
-require('dotenv').config();
+const dotenv = require('dotenv');
 
+// Cargar variables de entorno
+dotenv.config();
+
+// Configuración de AWS
 AWS.config.update({
-    accessKeyId: process.env.AWS_ACESS_KEY_ID,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION
 });
 
 const s3 = new AWS.S3();
+const app = express();
+const port = process.env.PORT || 3000;
 
+// Subida de archivos
 app.use(fileUpload());
-//Conf Rutas
-app.use('/object-storage', routes);
 
-//Servidor
+// Importar rutas
+const localRoutes = require('./src/routes/local');
+const s3Routes = require('./src/routes/s3');
+
+// Rutas para archivos locales
+app.use('/local', localRoutes);
+
+// Rutas para S3
+app.use('/object-storage', s3Routes);
+
+// Ubicacion de archivos
+app.use('/assets', express.static(path.join(__dirname, 'src/assets')));
+
+// Iniciar servidor
 app.listen(port, () => {
-    console.log(`Servidor local corriento en el puerto localhost:${port}`);
+    console.log(`Servidor corriendo en el puerto ${port} dentro de la instancia EC2`);
 });
