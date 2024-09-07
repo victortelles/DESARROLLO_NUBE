@@ -46,7 +46,7 @@ const descargarArchivoS3 = (req, res) => {
 
 // Función para subir archivo a s3
 const subirArchivoS3 = (req, res) => {
-    // Verifica si se está enviando algún archivo
+    // validar si se está enviando algún archivo
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({
             message: 'No se ha cargado ningún archivo.'
@@ -54,7 +54,8 @@ const subirArchivoS3 = (req, res) => {
     }
 
     //Validar si hay archivo presente
-    const archivo = req.files.archivo;
+    const archivo = req.files[Object.keys(req.files)[0]];
+
     if(!archivo) {
         return res.status(400).json({
             message: 'No se ha encontrado el archivo en la solicitud.'
