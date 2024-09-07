@@ -53,13 +53,22 @@ const subirArchivoS3 = (req, res) => {
         });
     }
 
+    //Validar si hay archivo presente
     const archivo = req.files.archivo;
+    if(!archivo) {
+        return res.status(400).json({
+            message: 'No se ha encontrado el archivo en la solicitud.'
+        });
+    }
+
+    //Parametros s3
     const params = {
         Bucket: BUCKET_NAME,
         Key: archivo.name,
         Body: archivo.data,
     };
 
+    //Process para subir a s3
     s3.upload(params, (err, data) => {
         if (err) {
             return res.status(500).json({
