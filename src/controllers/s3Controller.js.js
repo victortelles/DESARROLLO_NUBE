@@ -1,7 +1,7 @@
 //Librerias
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
-const BUCKET_NAME = process.env.S3_NAME;
+const BUCKET_NAME = process.env.S3_BUCKET;
 
 // Funcion para listar archivos desde s3
 const listarArchivosS3 = (req, res) => {
