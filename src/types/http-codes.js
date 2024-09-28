@@ -1,0 +1,32 @@
+module.exports = {
+    //HTTP 1xx
+    CONTINUE: 100,
+    SWITCHING_PROTOCOLS: 101,
+    PROCESSING: 102,
+
+    //HTTP 2xx
+    OK: 200,
+    CREATED: 201,
+    ACEPTED: 202,
+    INFO_NOT_AUTORIZATED: 203,
+
+    //HTTP 3xx
+    REDIRECT: 300,
+    MOVED: 301,
+    FOUND: 302,
+    OTHERS: 303,
+
+    //HTTP 4xx
+    BAD_REQUEST: 400,
+    NOT_AUTORIZATED: 401,
+    PROHIBED: 403,
+    NOT_FOUND: 404,
+
+
+    //HTTP 5xx
+    INTERNAL_SERVER_ERROR: 500,
+    BAD_GATEWAY: 502,
+    NOT_AVALIABLE: 503,
+    TIME_OUT: 504
+
+};
