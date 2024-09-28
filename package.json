@@ -8,5 +8,8 @@
   },
   "keywords": [],
   "author": "Victor Telles 737066",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
 }
