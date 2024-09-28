@@ -4,6 +4,8 @@
   "description": "Examen Practico, Hacer un punto de venta y ser notificado hacia el usuario",
   "main": "index.js",
   "scripts": {
+    "start": " node index.js",
+    "dev": " nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,5 +13,10 @@
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^3.1.7"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
   }
 }
