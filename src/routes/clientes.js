@@ -8,7 +8,7 @@ const clientesController = new ClientesController();
 
 // Rutas de Clientes
 // Obtener todos los clientes
-router.get('/', (req, res) => clientesController.getAllClientes(req, res));
+router.get('/', (req, res) => clientesController.getClientes(req, res));
 
 // Obtener cliente por ID
 router.get('/:id', (req, res) => clientesController.getClienteById(req, res));
