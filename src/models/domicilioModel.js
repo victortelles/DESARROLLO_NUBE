@@ -12,7 +12,7 @@ const Domicilio = sequelize.define('Domicilio', {
     },
     cliente_id: {
         type: DataTypes.INTEGER,
-        allowNull: false, 
+        allowNull: false,
         reference: {
             model: Cliente,
             key: 'id'
