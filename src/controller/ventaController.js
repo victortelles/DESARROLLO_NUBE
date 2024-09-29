@@ -99,7 +99,7 @@ class VentaController {
         }
     }
 
-    //Descargar PDF de una venta
+    //Descargar PDF de una venta (falta)
     downloadPDF(req, res) {
         res.send('Descargando PDF de la venta con ID: '+ req.params.id);
     }

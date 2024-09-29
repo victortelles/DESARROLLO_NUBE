@@ -15,10 +15,10 @@ router.get('/:id', (req, res) => ventaController.getVentaById(req, res));
 //crear una nueva venta
 router.post('/', (req, res) => ventaController.createVenta(req, res));
 
-//crear una nueva venta
+//Actualizar una nota de venta
 router.put('/:id', (req, res) => ventaController.updateVenta(req, res));
 
-//crear una nueva venta
+//eliminar una nota de venta.
 router.delete('/:id', (req, res) => ventaController.deleteVenta(req, res));
 
 //Descargar PDF de la venta
