@@ -14,6 +14,9 @@ const sequelize = new Sequelize(
         port: process.env.DB_PORT || 3306,
         dialect: 'mysql',
         logging: false, //logs
+        dialectOptions: {
+            connectTimeout: 10000
+        }
     }
 );
 
@@ -24,6 +27,14 @@ sequelize.authenticate()
     })
     .catch(err => {
         console.error('Error al conectarse a la base de datos:', err);
+    });
+
+sequelize.query('CREATE DATABASE IF NOT EXISTS exampracticords;')
+    .then(() => {
+        console.log('Base de datos creada exitosamente.');
+    })
+    .catch(err => {
+        console.error('Error al crear la base de datos:', err);
     });
 
 module.exports = sequelize;
