@@ -37,4 +37,12 @@ sequelize.query('CREATE DATABASE IF NOT EXISTS exampracticords;')
         console.error('Error al crear la base de datos:', err);
     });
 
+sequelize.sync({ force: false })
+    .then(() => {
+        console.log('Tablas creadas exitosamente.');
+    })
+    .catch((error) => {
+        console.error('Error al crear las tablas:', error);
+    });
+
 module.exports = sequelize;

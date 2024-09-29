@@ -31,4 +31,4 @@ const Cliente = sequelize.define('Cliente', {
     timestamps: false
 });
 
-module.exports = Cliente;
+module.exports = Cliente ;

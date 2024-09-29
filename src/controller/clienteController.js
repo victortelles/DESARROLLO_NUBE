@@ -1,4 +1,4 @@
-const { Cliente } = require('../models/clienteModel');
+const Cliente  = require('../models/clienteModel');
 const httpCodes = require('../types/http-codes');
 
 const AWS = require('aws-sdk');
@@ -71,7 +71,7 @@ class ClientesController {
                 nombre_comercial,
                 correo_electronico
             });
-            res.status(httpCodes.OK.json(cliente));
+            res.status(httpCodes.OK).json(cliente);
 
         } catch (error) {
             console.error ('Error al actualizar al cliente: ', error);
@@ -90,7 +90,7 @@ class ClientesController {
 
             //Eliminacion
             await cliente.destroy();
-            res.status(httpCodes.OK).json({ message: 'Cliente ha sido eliminado'});
+            res.status(httpCodes.OK).json({ message: `Cliente con id: ${cliente.id} ha sido eliminado`});
 
         } catch (error) {
             console.error('Error al eliminar al cliente: ', error);
