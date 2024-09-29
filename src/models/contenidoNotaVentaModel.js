@@ -33,16 +33,16 @@ const ContenidoNotaVenta = sequelize.define('ContenidoNotaVenta', {
         allowNull: false
     },
     precio_unitario: {
-        type: DataTypes.DECIMAL(10, 2), // Precio unitario del producto
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     },
     importe: {
-        type: DataTypes.DECIMAL(10, 2), // Importe total para este contenido
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     }
 }, {
-    tableName: 'contenido_notas_venta', // Nombre de la tabla en la base de datos
-    timestamps: false // No se usarán timestamps automáticos
+    tableName: 'contenido_notas_venta',
+    timestamps: false
 });
 
 // Definicion de relaciones
