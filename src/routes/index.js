@@ -12,6 +12,6 @@ const ventasRoutes = require('./ventas');
 router.use('/clientes', clientesRoutes);
 router.use('/domicilios', domiciliosRoutes);
 router.use('/productos', productosRoutes);
-//router.use('/ventas', ventasRoutes);
+router.use('/ventas', ventasRoutes);
 
 module.exports = router;
