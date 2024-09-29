@@ -22,12 +22,12 @@ class DomicilioController {
 
     //Actualizacion Domicilio
     updateDomicilio(req, res) {
-        res.send('Domicilio actualizado');
+        res.send('Domicilio actualizado'  + req.params.id);
     }
 
     //Eliminacion del domicilio
     deleteDomicilio(req, res) {
-        res.send('Domicilio eliminado');
+        res.send('Domicilio eliminado'  + req.params.id);
     }
 }
 
