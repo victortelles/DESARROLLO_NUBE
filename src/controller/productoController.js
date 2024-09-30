@@ -1,24 +1,21 @@
 const AWS = require('aws-sdk');
 const httpCodes = require('../types/http-codes');
 const db = require('../config/db');
+const Producto = require('../models/productoModel');
 
 //Configuracion AWS.
 AWS.config.update({
     region: process.env.AWS_REGION || 'us-east-1',
 });
 
-const s3 =new AWS.S3();
-const sns = new AWS.SNS();
 
 class ProductoController{
 
     //Obtener todo los productos
     async getAllProductos(req, res) {
         try {
-            const [productos] = await db.query('SELECT * FROM productos');
-            //obtenido
+            const productos = await Producto.findAll();
             res.status(httpCodes.OK).json(productos);
-
         } catch (error) {
             console.error(error);
             res.status(httpCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error al obtener los productos' });
@@ -29,12 +26,12 @@ class ProductoController{
     async getProductoById(req, res) {
         const { id } = req.params;
         try {
-            const [producto] = await db.query('SELECT * FROM productos WHERE id = ?', [id]);
-            if (producto.lenght === 0) {
+            const producto= await Producto.findByPk(id);
+            if (!producto) {
                 return res.status(httpCodes.NOT_FOUND).send('Producto no encontrado');
             }
             //Obtenido
-            res.status(httpCodes.OK).json(producto[0]);
+            res.status(httpCodes.OK).json(producto);
         } catch (error) {
             console.error(error);
             res.status(httpCodes.INTERNAL_SERVER_ERROR).send('Error al obtener el producto');
@@ -43,11 +40,22 @@ class ProductoController{
 
     //Crear un nuevo producto
     async createProducto(req, res) {
-        const {nombre, unidadMedida, precioBase } = req.body;
+        const {nombre, unidad_medida, precio_base } = req.body;
+
+        //validaciones
+        if(!nombre || !unidad_medida || precio_base == null){
+            return res.status(httpCodes.BAD_REQUEST).json({ message: 'Todos los campos son obligatorios.'});
+        }
+
         try {
-            const [result] = await db.query('INSERT INTO Productos (nombre, unidad_medida, precio_base) VALUES (?, ?, ?)', [nombre, unidadMedida, precioBase]);
+            const nuevoProducto = await Producto.create({
+                nombre,
+                unidad_medida,
+                precio_base
+            });
             //Creado
-            res.status(httpCodes.CREATED).json({ id: result.insertId, nombre, unidadMedida, precioBase });
+            res.status(httpCodes.CREATED).json(nuevoProducto);
+
         } catch (error) {
             console.error(error);
             res.status(httpCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error al crear el producto'});
@@ -57,20 +65,23 @@ class ProductoController{
     //actualizar producto
     async updateProducto(req, res) {
         const { id } = req.params;
-        const { nombre, unidadMedida, precioBase } = req.body;
+        const { nombre, unidad_medida, precio_base } = req.body;
+
         try {
-            const [result] = await db.query('UPDATE Productos SET nombre = ?, unidad_medida = ?, precio_base = ? WHERE id = ?', [nombre, unidadMedida, precioBase, id]);
-            if (result.affectedRows === 0) {
-                return res.status(httpCodes.NOT_FOUND).send('Producto no encontrado');
+            const producto = await Producto.findByPk(id);
+
+            //Si no existe el producto
+            if(!producto) {
+                return res.status(httpCodes.NOT_FOUND).json({ message: 'Producto no encontrado' });
             }
 
-            //Actualizado
-            res.status(httpCodes.OK).send('Producto actualizado');
+            //Actualizacion
+            await producto.update({ nombre, unidad_medida, precio_base });
+            res.status(httpCodes.OK).json({ message: 'Producto actualizado '});
 
         } catch (error) {
             console.error(error);
             res.status(httpCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error al actualizar el producto'});
-
         }
     }
 
@@ -78,12 +89,15 @@ class ProductoController{
     async deleteProducto(req, res){
         const { id } = req.params;
         try {
-            const [result] = await db.query('DELETE FROM Productos WHERE id = ?', [id]);
-            if (result.affectedRows === 0) {
-                return res.status(httpCodes.NOT_FOUND).send('Producto no encontrado');
+            const producto = await Producto.findByPk(id);
+            if(!producto) {
+                return res.status(httpCodes.NOT_FOUND).json({ message: 'Producto no encontrado' });
             }
+
             //Eliminado
-            res.status(httpCodes.OK).send('Producto eliminado');
+            await producto.destroy();
+            res.status(httpCodes.OK).json({ message: 'Producto eliminado'});
+
         } catch (error) {
             console.error(error);
             res.status(httpCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error al eliminar el producto'});
