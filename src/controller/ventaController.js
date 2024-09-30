@@ -1,9 +1,10 @@
 const AWS = require('aws-sdk');
 const httpCodes = require('../types/http-codes');
-const { NotaVenta } = require('../models/notaVentaModel');
+const NotaVenta = require('../models/notaVentaModel');
 const PDFDocument = require('pdfkit');
 const s3 = new AWS.S3();
 const sns = new AWS.SNS();
+require('dotenv').config();
 
 // Configuración de AWS
 AWS.config.update({
@@ -32,6 +33,7 @@ class VentaController {
             if (!venta) {
                 res.status(httpCodes.NOT_FOUND).json({ message: 'Nota de venta no encontrada' });
             }
+
             //Venta encontrada
             res.status(httpCodes.OK).json(venta);
         } catch (error) {
@@ -43,13 +45,13 @@ class VentaController {
     //Crear nueva venta
     async createVenta(req, res) {
         try {
-            const { clienteId, direccionFacturacion, direccionEnvio, totalNota } = req.body;
+            const { cliente_id, direccion_facturacion_id, direccion_envio_id, total_nota } = req.body;
             //Nueva venta
             const nuevaVenta = await NotaVenta.create({
-                clienteId,
-                direccionFacturacion,
-                direccionEnvio,
-                totalNota
+                cliente_id,
+                direccion_facturacion_id,
+                direccion_envio_id,
+                total_nota
             });
 
             //Generacion de PDF
@@ -69,10 +71,10 @@ class VentaController {
 
             //Info PDF
             doc.text(`Nota de venta #${nuevaVenta.id}`);
-            doc.text(`Cliente ID:: ${clienteId}`);
-            doc.text(`Dirección de facturación: ${direccionFacturacion}`);
-            doc.text(`Dirección de envío: ${direccionEnvio}`);
-            doc.text(`Total: $${totalNota}`);
+            doc.text(`Cliente ID:: ${cliente_id}`);
+            doc.text(`Dirección de facturación: ${direccion_facturacion_id}`);
+            doc.text(`Dirección de envío: ${direccion_envio_id}`);
+            doc.text(`Total: $${total_nota}`);
             doc.end();
 
             //Esperar a la generacion del pdf
@@ -81,22 +83,22 @@ class VentaController {
             //Subir PDf a S3
             const pdfKey = `notas-de-venta/nota_${nuevaVenta.id}.pdf`;
             const params = {
-                Bucket: process.env.S3.BUCKET_NAME,
+                Bucket: process.env.AWS_BUCKET_S3,
                 Key: pdfKey,
                 Body: pdfData,
                 ContentType: 'application/pdf',
-                ACL: 'public-read', //Enlace de descarga
+                //ACL: 'public-read', //Enlace de descarga
             };
 
             await s3.upload(params).promise();
 
             //URL de pdf en s3
-            const pdfUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${pdfKey}`;
+            const pdfUrl = `https://${process.env.AWS_BUCKET_S3}.s3.amazonaws.com/${pdfKey}`;
 
             const snsParams = {
                 Message: `Gracias por su compra. Aquí tiene la nota de venta #${nuevaVenta.id}. Puede descargar el PDF de la nota en el siguiente enlace: ${pdfUrl}`,
                 Subject: `Nota de venta #${nuevaVenta.id}`,
-                TopicArn: process.env.SNS.TOPIC_ARN,
+                TopicArn: process.env.AWS_SNS_TOPIC_ARN,
                 MessageAttributes: {
                     'AWS.SNS.SMS.SMSType': {
                         DataType: 'String',
@@ -124,7 +126,7 @@ class VentaController {
     async updateVenta(req, res) {
         try {
             const { id } = req.params;
-            const { direccionFacturacion, direccionEnvio, totalNota } = req.body;
+            const { direccion_facturacion_id, direccion_envio_id, total_nota } = req.body;
 
             const venta = await NotaVenta.findByPk(id);
             if (!venta) {
@@ -133,9 +135,9 @@ class VentaController {
 
             //Actualizar la venta en RDS
             await venta.update({
-                direccionFacturacion,
-                direccionEnvio,
-                totalNota
+                direccion_facturacion_id,
+                direccion_envio_id,
+                total_nota
             });
 
             //Generacion de un nuevo PDF
@@ -154,29 +156,40 @@ class VentaController {
 
             //Info a actualizar el PDF
             doc.text(`Nota de venta actualizada #${venta.id}`);
-            doc.text(`Cliente ID:: ${venta.clienteId}`);
-            doc.text(`Dirección de facturación: ${direccionFacturacion}`);
-            doc.text(`Dirección de envío: ${direccionEnvio}`);
-            doc.text(`Total actualizado: $${totalNota}`);
+            doc.text(`Cliente ID: ${venta.cliente_id}`);
+            doc.text(`Dirección de facturación: ${direccion_facturacion_id}`);
+            doc.text(`Dirección de envío: ${direccion_envio_id}`);
+            doc.text(`Total actualizado: $${total_nota}`);
             doc.end();
 
             //Esperar la generacion del PDF
             const pdfData =await pdfDataPromise;
 
             //Subir a s3
-            const pdfKey = `notas-de-venta/nota_${venta.id}.pdf`;
+            const pdfKey = `notas-de-venta/nota_${venta.id}_actualizada.pdf`;
             const params = {
-                Bucket: process.env.S3_BUCKET_NAME,
+                Bucket: process.env.AWS_BUCKET_S3,
                 Key: pdfKey,
                 Body: pdfData,
                 ContentType: 'application/pdf',
-                ACL: 'public-read',
+                //ACL: 'public-read',
             };
 
             await s3.upload(params).promise();
 
+            //URL de PDF Actualizado en S3
+            const pdfUrl = `https://${process.env.AWS_BUCKET_S3}.s3.amazonaws.com/${pdfKey}`;
+
+            //Enviar notificacion
+            const snsParams = {
+                Message: `Nota de venta actualizada #${venta.id} disponible en ${pdfUrl}`,
+                Subject: `Nota de venta #${venta.id} actualizada`,
+                TopicArn: process.env.AWS_SNS_TOPIC_ARN,
+            };
+            await sns.publish(snsParams).promise();
+
             //Nota venta Actulizada
-            res.status(httpCodes.OK).json({ message: 'Venta y PDF actualizados', venta });
+            res.status(httpCodes.OK).json({ message: 'Venta y PDF actualizados', pdfUrl });
 
         } catch (error) {
             console.error('Error al actualizar nota de venta:', error);
@@ -196,7 +209,7 @@ class VentaController {
             //Eliminar el pdf de s3
             const pdfKey = `notas-de-venta/nota_${venta.id}.pdf`;
             const params ={
-                Bucket: process.env.S3_BUCKET_NAME,
+                Bucket: process.env.AWS_BUCKET_S3,
                 Key: pdfKey,
             };
 
@@ -224,7 +237,7 @@ class VentaController {
 
             //Generar la URL del PDF almacenadado en S3
             const pdfKey = `notas-de-venta/nota_${venta.id}.pdf`;
-            const pdfUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${pdfKey}`;
+            const pdfUrl = `https://${process.env.AWS_BUCKET_S3}.s3.amazonaws.com/${pdfKey}`;
 
             res.status(httpCodes.OK).json({ pdfUrl });
 

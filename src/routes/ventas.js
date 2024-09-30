@@ -7,7 +7,7 @@ const ventaController = new VentaController();
 
 //RUtas de ventas
 //Obtener todas las vetnas
-router.get('/', (req, res) => ventaController.getAllVentas(req, res));
+router.get('/', (req, res) => ventaController.getAllventas(req, res));
 
 //Obtener venta por id
 router.get('/:id', (req, res) => ventaController.getVentaById(req, res));
