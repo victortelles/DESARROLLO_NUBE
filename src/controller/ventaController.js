@@ -166,7 +166,7 @@ class VentaController {
             const pdfData =await pdfDataPromise;
 
             //Subir a s3
-            const pdfKey = `notas-de-venta/nota_${venta.id}_actualizada.pdf`;
+            const pdfKey = `notas-de-venta/nota_${venta.id}.pdf`;
             const params = {
                 Bucket: process.env.AWS_BUCKET_S3,
                 Key: pdfKey,
@@ -230,6 +230,7 @@ class VentaController {
     async downloadPDF(req, res) {
         try {
             const { id } = req.params;
+
             const venta = await NotaVenta.findByPk(id);
             if (!venta) {
                 return res.status(httpCodes.NOT_FOUND).json({ message: 'Nota de venta no encontrada' });
@@ -237,12 +238,44 @@ class VentaController {
 
             //Generar la URL del PDF almacenadado en S3
             const pdfKey = `notas-de-venta/nota_${venta.id}.pdf`;
+
+            //Validar si existe en s3
+            const params = {
+                Bucket: process.env.AWS_BUCKET_S3,
+                Key: pdfKey,
+            }
+
+            try {
+                await s3.headObject(params).promise();
+            } catch (s3Error) {
+                if(s3Error.code === 'NotFound'){
+                    return res.status(httpCodes.NOT_FOUND).json({ message: 'PDF no encontrado' });
+                } else {
+                    throw s3Error;
+                }
+            }
+
+            // Descargar el archivo PDF desde S3
+            const pdfObject = await s3.getObject(params).promise();
+
+            // Configurar los encabezados para vista previa y descarga
+            res.setHeader('Content-Type', 'application/pdf');
+            //res.setHeader('Content-Disposition', `inline; filename=nota_${venta.id}.pdf`);
+            res.setHeader('Content-Disposition',  `attachment; filename=nota_${venta.id}.pdf`);
+            res.setHeader('Content-Length', pdfObject.ContentLength);
+
+            // Enviar el archivo PDF como respuesta
+            res.status(httpCodes.OK).send(pdfObject.Body);
+
+            /**
+            //Generar la url del pdf almacenado en s3 si existe.
             const pdfUrl = `https://${process.env.AWS_BUCKET_S3}.s3.amazonaws.com/${pdfKey}`;
 
+            //Obtenido
             res.status(httpCodes.OK).json({ pdfUrl });
-
+            **/
         } catch (error) {
-            console.err('Error al descargar el PDF:' , error);
+            console.error('Error al descargar el PDF:' , error);
             res.status(httpCodes.INTERNAL_SERVER_ERROR).json({ error: 'Error al descargar el PDF' });
         }
     }
