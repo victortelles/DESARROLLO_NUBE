@@ -3,6 +3,8 @@ const ContenidoNotaVenta = require('../models/contenidoNotaVentaModel');
 const httpCodes = require('../types/http-codes');
 const PDFDocument = require('pdfkit');
 const s3 = new AWS.S3();
+const sns = new AWS.SNS();
+require('dotenv').config();
 
 //Configuracion de AWS
 AWS.config.update({
@@ -66,7 +68,23 @@ class ContenidoVentaController{
             // URL del PDF en S3
             const pdfUrl = `https://${process.env.AWS_BUCKET_S3}.s3.amazonaws.com/${pdfKey}`;
 
-            //Se crea
+            //Notificacion
+            const snsParams = {
+                Message: `Aquí tiene el contenido de la nota de venta #${nuevoContenido.id}. Puede descargar el PDF del contenido de la nota en el siguiente enlace: ${pdfUrl}`,
+                Subject: `Contenido de la Nota de Venta #${nuevoContenido.id}`,
+                TopicArn: process.env.AWS_SNS_TOPIC_ARN,
+                MessageAttributes: {
+                    'AWS.SNS.SMS.SMSType': {
+                        DataType: 'String',
+                        StringValue: 'Transactional',
+                    }
+                }
+            };
+
+            //Enviar notificacion
+            await sns.publish(snsParams).promise();
+
+            //Notf: Creada la venta
             res.status(httpCodes.CREATED).json({ contenido: nuevoContenido, pdfUrl });
 
         } catch (error) {
